@@ -119,6 +119,7 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
             new_flag.append(new_line)
 
             length_diff = 0
+            del_length = 0
             for segment in flag_line:
                 length = segment.length * scale + length_diff
                 cap = segment.cap
@@ -127,12 +128,16 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
                 if cap == LineCap.Square:
                     length_diff = 0
                 elif cap == LineCap.TriDown:
-                    length_diff = offset * 2
+                    length_diff = offset * 3
                 elif cap == LineCap.TriUp:
-                    length_diff = scale_index * 2
+                    length_diff = scale_index * 3
                 length -= length_diff
+                length -= del_length
 
-                new_line.append(LineSegment(col, max(length, 0), cap))
+                if length < 0:
+                    del_length = - length
+                else:
+                    new_line.append(LineSegment(col, length, cap))
             is_odd_line = not is_odd_line
 
     return new_flag
@@ -311,6 +316,7 @@ def draw_wrapped_flag_list(buf: list[str], flags: list[Flag], scale: int = 1) ->
             draw_flag_list(buf, bucket)
             #buf.append(f'\x1B[{current_width}D\x1B[3B')
             #buf.append(f'\x1B[3B')
+            buf.append(f'\n\n')
 
             bucket.clear()
             current_width = width
@@ -328,7 +334,7 @@ def main() -> None:
     #buf.append('\n' * newlines)
     #buf.append(f'\x1B[{newlines}A')
     #draw_flag(buf, ProgressPrideFlag)
-    draw_wrapped_flag_list(buf, [ProgressPrideFlag, AllyFlag, TransFlag, FlagOfAustria, FLagOfSouthAfrica], 1)
+    draw_wrapped_flag_list(buf, [ProgressPrideFlag, AllyFlag, TransFlag, FlagOfAustria, FLagOfSouthAfrica], 4)
     print(''.join(buf))
 
 if __name__ == '__main__':
