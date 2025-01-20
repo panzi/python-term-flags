@@ -83,7 +83,7 @@ PPurple   = (109,  35, 128)
 Color = tuple[int, int, int]
 
 class LineSegment(NamedTuple):
-    color: Color
+    color: Optional[Color]
     length: int
     cap: LineCap
 
@@ -235,7 +235,13 @@ FLAGS: dict[str, Flag] = {
         [LS(ISRed,  10, HS), LS(White,  0, SQ), LS(ISRed, 2, SQ), LS(ISRed,  18, HS), LS(White,   0, SQ)],
         [LS(ISBlue,  8, HS), LS(White,  2, SQ), LS(ISRed, 2, SQ), LS(White,   2, SQ), LS(ISBlue, 16, HS), LS(White,   0, SQ)],
         [LS(ISBlue,  8, SQ), LS(White,  2, SQ), LS(ISRed, 2, SQ), LS(White,   2, SQ), LS(ISBlue, 16, SQ)],
-        [LS(ISBlue,  8, SQ), LS(White,  2, SQ), LS(ISRed, 2, SQ), LS(White,   2, SQ), LS(ISBlue, 16, SQ)],
+        [
+            LS(None,  8, HS), LS(ISBlue, 0, HS),
+            LS(None,  2, HS), LS(White,  0, HS),
+            LS(None,  2, HS), LS(ISRed,  0, HS),
+            LS(None,  2, HS), LS(White,  0, HS),
+            LS(None, 16, HS), LS(ISBlue, 0, HS),
+        ],
     ],
     'ukraine': [
         [LS(UABlue,   30, SQ)],
@@ -345,7 +351,7 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
                         if next_index < len(flag_line):
                             col = flag_line[next_index].color
                         else:
-                            col = Black
+                            col = None
                     cap = LineCap.Square
                 else:
                     raise ValueError(f'unhandled LineCap value: {cap}')
@@ -429,20 +435,37 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
 
             if cap == LineCap.Square:
                 if length > 0:
-                    set_fg(col)
-                    buf.append('█' * (length >> 1))
+                    if col is None:
+                        set_bg(None)
+                        buf.append(' ' * (length >> 1))
 
-                    if carry_x:
-                        set_cols(next_col, col)
-                        buf.append('▌')
+                        if carry_x:
+                            set_cols(next_col, col)
+                            buf.append(' ')
+
+                    else:
+                        set_fg(col)
+                        buf.append('█' * (length >> 1))
+
+                        if carry_x:
+                            set_cols(next_col, col)
+                            buf.append('▌')
 
             elif cap == LineCap.HalfSquare:
                 if length > 0:
-                    set_cols(next_col or Black, col)
-                    buf.append('▄' * (length >> 1))
+                    if col is None:
+                        set_cols(col, next_col)
+                        buf.append('▀' * (length >> 1))
 
-                    if carry_x:
-                        buf.append('▖')
+                        if carry_x:
+                            buf.append('▘')
+
+                    else:
+                        set_cols(next_col, col)
+                        buf.append('▄' * (length >> 1))
+
+                        if carry_x:
+                            buf.append('▖')
 
             else:
                 block_length = max(length - cap.length, 0)
