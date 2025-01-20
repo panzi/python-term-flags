@@ -114,6 +114,7 @@ ZABlue   = (  0,  19, 137)
 
 ATRed = (200,  16,  46)
 CHRed = (255,   0,   0)
+BHRed = (218,  41,  28)
 
 ISBlue = (  2,  82, 156)
 ISRed  = (220,  30,  53)
@@ -141,12 +142,64 @@ FLAGS: dict[str, Flag] = {
         [LS(Black,  6, U3), LS(PBlue,   12, U3), LS(Black,  3, D3), LS(PBlue,   12, D3), LS(Black, 3, SQ)],
         [LS(White,  3, U3), LS(PPurple, 12, U3), LS(White,  9, D3), LS(PPurple, 12, D3), LS(White, 0, SQ)],
     ],
-    'trans': [
+    'transgender': [
         [LS(TransBlue, 30, SQ)],
         [LS(TransPink, 30, SQ)],
         [LS(White,     30, SQ)],
         [LS(TransPink, 30, SQ)],
         [LS(TransBlue, 30, SQ)],
+    ],
+    'nonbinary': [
+        [LS((252, 245,  54), 26, SQ)],
+        [LS(White,           26, SQ)],
+        [LS((157,  89, 208), 26, SQ)],
+        [LS(( 44,  44,  44), 26, SQ)],
+    ],
+    'asexual': [
+        [LS(Black,           26, SQ)],
+        [LS((163, 163, 163), 26, SQ)],
+        [LS(White,           26, SQ)],
+        [LS((129,   0, 127), 26, SQ)],
+    ],
+    'bisexual': [
+        [LS((214,   2, 112), 30, SQ)],
+        [LS((214,   2, 112), 30, SQ)],
+        [LS((155,  79, 149), 30, SQ)],
+        [LS((  0,  56, 167), 30, SQ)],
+        [LS((  0,  56, 167), 30, SQ)],
+    ],
+    'pansexual': [
+        [LS((255,  33, 140), 30, SQ)],
+        [LS((255,  33, 140), 30, SQ)],
+        [LS((255, 216,   0), 30, SQ)],
+        [LS((255, 216,   0), 30, SQ)],
+        [LS(( 33, 177, 254), 30, SQ)],
+        [LS(( 33, 177, 254), 30, SQ)],
+    ],
+    'lesbian': [
+        [LS((214,  44,   0), 34, SQ)],
+        [LS((239, 117,  39), 34, SQ)],
+        [LS((255, 153,  86), 34, SQ)],
+        [LS(White,           34, SQ)],
+        [LS((209,  98, 164), 34, SQ)],
+        [LS((181,  86, 144), 34, SQ)],
+        [LS((164,   1,  98), 34, SQ)],
+    ],
+    'gay-men': [
+        [LS((  7, 140, 111), 34, SQ)],
+        [LS(( 37, 206, 169), 34, SQ)],
+        [LS((152, 233, 193), 34, SQ)],
+        [LS(White,           34, SQ)],
+        [LS((123, 173, 226), 34, SQ)],
+        [LS(( 80,  73, 203), 34, SQ)],
+        [LS(( 61,  26, 119), 34, SQ)],
+    ],
+    'arbosexual': [
+        [LS((117, 202, 145), 30, SQ)],
+        [LS((180, 229, 202), 30, SQ)],
+        [LS(White,           30, SQ)],
+        [LS((233, 149, 183), 30, SQ)],
+        [LS((218,  68, 111), 30, SQ)],
     ],
     'austria': [
         [LS(ATRed, 30, SQ)],
@@ -160,8 +213,8 @@ FLAGS: dict[str, Flag] = {
         [LS(ZAYellow, 1, D3), LS(ZAGreen,  7, D3), LS(White,    4, D3), LS(ZARed,   28, SQ)],
         [LS(ZAYellow, 4, D3), LS(ZAGreen,  7, D3), LS(White,    4, D3), LS(ZARed,   25, SQ)],
         [LS(Black,    3, D3), LS(ZAYellow, 4, D3), LS(ZAGreen,  7, D3), LS(White,   26, SQ)],
-        [LS(Black,    3, SQ), LS(ZAYellow, 4, SQ), LS(ZAGreen, 33, SQ)],
-        #[LS(Black,    6, U3), LS(ZAYellow, 4, U3), LS(ZAGreen, 30, SQ)],
+        [LS(Black,    6, D3), LS(ZAYellow, 4, D3), LS(ZAGreen, 30, SQ)],
+        [LS(Black,    6, U3), LS(ZAYellow, 4, U3), LS(ZAGreen, 30, SQ)],
         [LS(Black,    3, U3), LS(ZAYellow, 4, U3), LS(ZAGreen,  7, U3), LS(White,   26, SQ)],
         [LS(ZAYellow, 4, U3), LS(ZAGreen,  7, U3), LS(White,    4, U3), LS(ZABlue,  25, SQ)],
         [LS(ZAYellow, 1, U3), LS(ZAGreen,  7, U3), LS(White,    4, U3), LS(ZABlue,  28, SQ)],
@@ -197,7 +250,19 @@ FLAGS: dict[str, Flag] = {
         [LS(PSRed, 18, U6), LS(White,   20, SQ)],
         [LS(PSRed, 12, U6), LS(PSGreen, 26, SQ)],
         [LS(PSRed,  6, U6), LS(PSGreen, 32, SQ)],
-    ]
+    ],
+    'bahrain': [
+        [LS(White, 18, D6), LS(BHRed, 36, SQ)],
+        [LS(White, 18, U6), LS(BHRed, 36, SQ)],
+        [LS(White, 18, D6), LS(BHRed, 36, SQ)],
+        [LS(White, 18, U6), LS(BHRed, 36, SQ)],
+        [LS(White, 18, D6), LS(BHRed, 36, SQ)],
+        [LS(White, 18, U6), LS(BHRed, 36, SQ)],
+        [LS(White, 18, D6), LS(BHRed, 36, SQ)],
+        [LS(White, 18, U6), LS(BHRed, 36, SQ)],
+        [LS(White, 18, D6), LS(BHRed, 36, SQ)],
+        [LS(White, 18, U6), LS(BHRed, 36, SQ)],
+    ],
 }
 
 FLAG_ALIASES = {
@@ -207,6 +272,12 @@ FLAG_ALIASES = {
     'is': FLAGS['iceland'],
     'ua': FLAGS['ukraine'],
     'ps': FLAGS['palestine'],
+    'bh': FLAGS['bahrain'],
+
+    'trans': FLAGS['transgender'],
+    'pan':   FLAGS['pansexual'],
+    'gay':   FLAGS['gay-men'],
+    'arbo':  FLAGS['arbosexual'],
 
     'iceland-highres': [
         [LS(ISBlue, 32, SQ), LS(White, 4, SQ), LS(ISRed,  8, SQ), LS(White, 4, SQ), LS(ISBlue, 64, SQ)],
