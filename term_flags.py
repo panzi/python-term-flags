@@ -50,11 +50,12 @@ from argparse import ArgumentParser, ArgumentTypeError
 import json
 
 class LineCap(Enum):
-    Square   = 1
-    TriDown3 = 2 # sub-character length: 3
-    TriUp3   = 3 # sub-character length: 3
-    TriDown6 = 4 # sub-character length: 6
-    TriUp6   = 5 # sub-character length: 6
+    Square     = 1
+    TriDown3   = 2 # sub-character length: 3
+    TriUp3     = 3 # sub-character length: 3
+    TriDown6   = 4 # sub-character length: 6
+    TriUp6     = 5 # sub-character length: 6
+    HalfSquare = 6 # not about the line cap, but the line thickness, but also requires square line cap
 
     @property
     def length(self) -> int:
@@ -62,7 +63,7 @@ class LineCap(Enum):
             return 3
         elif self == LineCap.TriDown6 or self == LineCap.TriUp6:
             return 6
-        elif self == LineCap.Square:
+        elif self == LineCap.Square or self == LineCap.HalfSquare:
             return 0
         else:
             raise ValueError(f'unhandled LineCap value: {self}')
@@ -89,17 +90,19 @@ class LineSegment(NamedTuple):
 Flag = list[list[LineSegment]]
 
 SQ = LineCap.Square
+HS = LineCap.HalfSquare
 D3 = LineCap.TriDown3
 U3 = LineCap.TriUp3
 D6 = LineCap.TriDown6
 U6 = LineCap.TriUp6
 
 LineCapMap = {
-    'sq': SQ, 'square':   SQ,
-    'd3': D3, 'tridown3': D3,
-    'u3': U3, 'triup3':   U3,
-    'd6': D6, 'tridown6': D6,
-    'u6': U6, 'triup6':   U6,
+    'sq': SQ, 'square':     SQ,
+    'hs': HS, 'halfsquare': HS,
+    'd3': D3, 'tridown3':   D3,
+    'u3': U3, 'triup3':     U3,
+    'd6': D6, 'tridown6':   D6,
+    'u6': U6, 'triup6':     U6,
 }
 
 LS = LineSegment
@@ -227,13 +230,12 @@ FLAGS: dict[str, Flag] = {
         [LS(CHRed, 20, SQ)],
     ],
     'iceland': [
-        [LS(ISBlue, 8, SQ), LS(White, 2, SQ), LS(ISRed,  2, SQ), LS(White, 2, SQ), LS(ISBlue, 16, SQ)],
-        [LS(ISBlue, 8, SQ), LS(White, 2, SQ), LS(ISRed,  2, SQ), LS(White, 2, SQ), LS(ISBlue, 16, SQ)],
-        [LS(White, 10, SQ), LS(ISRed, 2, SQ), LS(White, 18, SQ)],
-        [LS(ISRed, 30, SQ)],
-        [LS(White, 10, SQ), LS(ISRed, 2, SQ), LS(White, 18, SQ)],
-        [LS(ISBlue, 8, SQ), LS(White, 2, SQ), LS(ISRed, 2, SQ), LS(White, 2, SQ), LS(ISBlue, 16, SQ)],
-        [LS(ISBlue, 8, SQ), LS(White, 2, SQ), LS(ISRed, 2, SQ), LS(White, 2, SQ), LS(ISBlue, 16, SQ)],
+        [LS(ISBlue,  8, SQ), LS(White,  2, SQ), LS(ISRed, 2, SQ), LS(White,   2, SQ), LS(ISBlue, 16, SQ)],
+        [LS(ISBlue,  8, SQ), LS(White,  2, SQ), LS(ISRed, 2, SQ), LS(White,   2, SQ), LS(ISBlue, 16, SQ)],
+        [LS(ISRed,  10, HS), LS(White,  0, SQ), LS(ISRed, 2, SQ), LS(ISRed,  18, HS), LS(White,   0, SQ)],
+        [LS(ISBlue,  8, HS), LS(White,  2, SQ), LS(ISRed, 2, SQ), LS(White,   2, SQ), LS(ISBlue, 16, HS), LS(White,   0, SQ)],
+        [LS(ISBlue,  8, SQ), LS(White,  2, SQ), LS(ISRed, 2, SQ), LS(White,   2, SQ), LS(ISBlue, 16, SQ)],
+        [LS(ISBlue,  8, SQ), LS(White,  2, SQ), LS(ISRed, 2, SQ), LS(White,   2, SQ), LS(ISBlue, 16, SQ)],
     ],
     'ukraine': [
         [LS(UABlue,   30, SQ)],
@@ -321,7 +323,7 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
             new_flag.append(new_line)
 
             length_diff = 0
-            for segment in flag_line:
+            for segment_index, segment in enumerate(flag_line):
                 length = segment.length * scale + length_diff
                 cap = segment.cap
                 col = segment.color
@@ -336,6 +338,15 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
                     length_diff = offset * 6
                 elif cap == LineCap.TriUp6:
                     length_diff = scale_index * 6
+                elif cap == LineCap.HalfSquare:
+                    length_diff = 0
+                    if scale_index < (scale // 2):
+                        next_index = segment_index + 1
+                        if next_index < len(flag_line):
+                            col = flag_line[next_index].color
+                        else:
+                            col = Black
+                    cap = LineCap.Square
                 else:
                     raise ValueError(f'unhandled LineCap value: {cap}')
 
@@ -416,7 +427,24 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
             else:
                 next_col = None
 
-            if cap != LineCap.Square:
+            if cap == LineCap.Square:
+                if length > 0:
+                    set_fg(col)
+                    buf.append('█' * (length >> 1))
+
+                    if carry_x:
+                        set_cols(next_col, col)
+                        buf.append('▌')
+
+            elif cap == LineCap.HalfSquare:
+                if length > 0:
+                    set_cols(next_col or Black, col)
+                    buf.append('▄' * (length >> 1))
+
+                    if carry_x:
+                        buf.append('▖')
+
+            else:
                 block_length = max(length - cap.length, 0)
 
                 if block_length > 0:
@@ -478,15 +506,6 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
 
                         set_cols(next_col, col)
                         buf.append('🭘')
-
-            else:
-                if length > 0:
-                    set_fg(col)
-                    buf.append('█' * (length >> 1))
-
-                    if carry_x:
-                        set_cols(next_col, col)
-                        buf.append('▌')
 
             prev_carry_x = carry_x
 
