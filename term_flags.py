@@ -19,8 +19,8 @@
 # TODO: more angles?
 
 # sub-character length 6
-# 🭍🭧🬽 
-# 🭞🭆🭘 
+# 🭍🭧🬽
+# 🭞🭆🭘
 
 # ?🬾
 # ?🭙
@@ -32,10 +32,10 @@
 
 # 🭀
 # 🭐
-# █🭀 
-# █🭛 
+# █🭀
+# █🭛
 # 🭡
-# 🭛 
+# 🭛
 
 # 🭮
 # 🭬
@@ -127,6 +127,8 @@ UAYellow = (255, 215,   0)
 
 PSRed   = (237,  46,  56)
 PSGreen = (  0, 150,  57)
+
+ScotBlue = (  0,   94, 184)
 
 FLAGS: dict[str, Flag] = {
     'progress-pride': [
@@ -243,6 +245,14 @@ FLAGS: dict[str, Flag] = {
             LS(None, 16, HS), LS(ISBlue, 0, HS),
         ],
     ],
+    'scotland': [
+        [LS(White, 12, D6), LS(ScotBlue, 18, U6), LS(White, 6, SQ)],
+        [LS(ScotBlue, 6, D6), LS(White, 12, D6), LS(ScotBlue, 6, U6), LS(White, 12, U6), LS(ScotBlue, 0, SQ)],
+        [LS(ScotBlue, 12, D6), LS(White, 18, U6), LS(ScotBlue, 6, SQ)],
+        [LS(ScotBlue, 12, U6), LS(White, 18, D6), LS(ScotBlue, 6, SQ)],
+        [LS(ScotBlue, 6, U6), LS(White, 12, U6), LS(ScotBlue, 6, D6), LS(White, 12, D6), LS(ScotBlue, 0, SQ)],
+        [LS(White, 12, U6), LS(ScotBlue, 18, D6), LS(White, 6, SQ)],
+    ],
     'ukraine': [
         [LS(UABlue,   30, SQ)],
         [LS(UABlue,   30, SQ)],
@@ -281,6 +291,8 @@ FLAG_ALIASES = {
     'ua': FLAGS['ukraine'],
     'ps': FLAGS['palestine'],
     'bh': FLAGS['bahrain'],
+
+    'scot':  FLAGS['scotland'],
 
     'trans': FLAGS['transgender'],
     'pan':   FLAGS['pansexual'],
@@ -360,6 +372,8 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
 
                 if length < 0:
                     length_diff += length
+                    if segment_index > 0 and flag_line[segment_index - 1].cap == LineCap.HalfSquare:
+                        new_line.append(LineSegment(col, 0, cap))
                 else:
                     new_line.append(LineSegment(col, length, cap))
 
