@@ -10,10 +10,37 @@
 # U+1FB60 🭠
 # U+02588 █
 
+# sub-character length 3
 # 🭢🭕   U+1FB62 U+1FB55
 # ██🭏🬼 U+1FB4F U+1FB3C
 # ██🭠🭗 U+1FB60 U+1FB57
 # 🭇🭄   U+1FB47 U+1FB44
+
+# TODO: more angles?
+
+# sub-character length 6
+# 🭍🭧🬽 
+# 🭞🭆🭘 
+
+# ?🬾
+# ?🭙
+
+# 🬼
+# 🭌🬿
+# 🭝🭚
+# 🭗
+
+# 🭀
+# 🭐
+# █🭀 
+# █🭛 
+# 🭡
+# 🭛 
+
+# 🭮
+# 🭬
+# 🭪
+# 🭨
 
 from typing import NamedTuple, Optional, Any
 from enum import Enum
@@ -23,9 +50,22 @@ from argparse import ArgumentParser, ArgumentTypeError
 import json
 
 class LineCap(Enum):
-    Square  = 1
-    TriDown = 2
-    TriUp   = 3
+    Square   = 1
+    TriDown3 = 2 # sub-character length: 3
+    TriUp3   = 3 # sub-character length: 3
+    TriDown6 = 4 # sub-character length: 6
+    TriUp6   = 5 # sub-character length: 6
+
+    @property
+    def length(self) -> int:
+        if self == LineCap.TriDown3 or self == LineCap.TriUp3:
+            return 3
+        elif self == LineCap.TriDown6 or self == LineCap.TriUp6:
+            return 6
+        elif self == LineCap.Square:
+            return 0
+        else:
+            raise ValueError(f'unhandled LineCap value: {self}')
 
 White     = (255, 255, 255)
 Black     = (  0,   0,   0)
@@ -49,13 +89,17 @@ class LineSegment(NamedTuple):
 Flag = list[list[LineSegment]]
 
 SQ = LineCap.Square
-TD = LineCap.TriDown
-TU = LineCap.TriUp
+D3 = LineCap.TriDown3
+U3 = LineCap.TriUp3
+D6 = LineCap.TriDown6
+U6 = LineCap.TriUp6
 
 LineCapMap = {
-    'sq': SQ, 'square': SQ,
-    'td': TD, 'tridown': TD,
-    'tu': TU, 'triup': TU,
+    'sq': SQ, 'square':   SQ,
+    'd3': D3, 'tridown3': D3,
+    'u3': U3, 'triup3':   U3,
+    'd6': D6, 'tridown6': D6,
+    'u6': U6, 'triup6':   U6,
 }
 
 LS = LineSegment
@@ -82,20 +126,20 @@ PSGreen = (  0, 150,  57)
 
 FLAGS: dict[str, Flag] = {
     'progress-pride': [
-        [LS(TransPink, 3, TD), LS(TransBlue, 4, TD), LS(PBrown, 4, TD), LS(Black, 4, TD), LS(PRed, 21, SQ)],
-        [LS(White, 2, TD), LS(TransPink, 4, TD), LS(TransBlue, 4, TD), LS(PBrown, 4, TD), LS(Black, 4, TD), LS(POrange, 18, SQ)],
-        [LS(White, 5, TD), LS(TransPink, 4, TD), LS(TransBlue, 4, TD), LS(PBrown, 4, TD), LS(Black, 4, TD), LS(PYellow, 15, SQ)],
-        [LS(White, 5, TU), LS(TransPink, 4, TU), LS(TransBlue, 4, TU), LS(PBrown, 4, TU), LS(Black, 4, TU), LS(PGreen, 15, SQ)],
-        [LS(White, 2, TU), LS(TransPink, 4, TU), LS(TransBlue, 4, TU), LS(PBrown, 4, TU), LS(Black, 4, TU), LS(PBlue, 18, SQ)],
-        [LS(TransPink, 3, TU), LS(TransBlue, 4, TU), LS(PBrown, 4, TU), LS(Black, 4, TU), LS(PPurple, 21, SQ)],
+        [LS(TransPink, 3, D3), LS(TransBlue, 4, D3), LS(PBrown, 4, D3), LS(Black, 4, D3), LS(PRed, 21, SQ)],
+        [LS(White, 2, D3), LS(TransPink, 4, D3), LS(TransBlue, 4, D3), LS(PBrown, 4, D3), LS(Black, 4, D3), LS(POrange, 18, SQ)],
+        [LS(White, 5, D3), LS(TransPink, 4, D3), LS(TransBlue, 4, D3), LS(PBrown, 4, D3), LS(Black, 4, D3), LS(PYellow, 15, SQ)],
+        [LS(White, 5, U3), LS(TransPink, 4, U3), LS(TransBlue, 4, U3), LS(PBrown, 4, U3), LS(Black, 4, U3), LS(PGreen, 15, SQ)],
+        [LS(White, 2, U3), LS(TransPink, 4, U3), LS(TransBlue, 4, U3), LS(PBrown, 4, U3), LS(Black, 4, U3), LS(PBlue, 18, SQ)],
+        [LS(TransPink, 3, U3), LS(TransBlue, 4, U3), LS(PBrown, 4, U3), LS(Black, 4, U3), LS(PPurple, 21, SQ)],
     ],
     'ally': [
-        [LS(Black, 18, TU), LS(PRed,     3, TD), LS(Black, 15, SQ)],
-        [LS(White, 15, TU), LS(POrange,  9, TD), LS(White, 12, SQ)],
-        [LS(Black, 12, TU), LS(PYellow, 15, TD), LS(Black,  9, SQ)],
-        [LS(White,  9, TU), LS(PGreen,  21, TD), LS(White,  6, SQ)],
-        [LS(Black,  6, TU), LS(PBlue,   12, TU), LS(Black,  3, TD), LS(PBlue,   12, TD), LS(Black, 3, SQ)],
-        [LS(White,  3, TU), LS(PPurple, 12, TU), LS(White,  9, TD), LS(PPurple, 12, TD), LS(White, 0, SQ)],
+        [LS(Black, 18, U3), LS(PRed,     3, D3), LS(Black, 15, SQ)],
+        [LS(White, 15, U3), LS(POrange,  9, D3), LS(White, 12, SQ)],
+        [LS(Black, 12, U3), LS(PYellow, 15, D3), LS(Black,  9, SQ)],
+        [LS(White,  9, U3), LS(PGreen,  21, D3), LS(White,  6, SQ)],
+        [LS(Black,  6, U3), LS(PBlue,   12, U3), LS(Black,  3, D3), LS(PBlue,   12, D3), LS(Black, 3, SQ)],
+        [LS(White,  3, U3), LS(PPurple, 12, U3), LS(White,  9, D3), LS(PPurple, 12, D3), LS(White, 0, SQ)],
     ],
     'trans': [
         [LS(TransBlue, 30, SQ)],
@@ -113,14 +157,14 @@ FLAGS: dict[str, Flag] = {
         [LS(ATRed, 30, SQ)],
     ],
     'south-africa': [
-        [LS(ZAYellow, 1, TD), LS(ZAGreen,  7, TD), LS(White,    4, TD), LS(ZARed,   28, SQ)],
-        [LS(ZAYellow, 4, TD), LS(ZAGreen,  7, TD), LS(White,    4, TD), LS(ZARed,   25, SQ)],
-        [LS(Black,    3, TD), LS(ZAYellow, 4, TD), LS(ZAGreen,  7, TD), LS(White,   26, SQ)],
-        [LS(Black,    6, TD), LS(ZAYellow, 4, TD), LS(ZAGreen, 30, SQ)],
-        [LS(Black,    6, TU), LS(ZAYellow, 4, TU), LS(ZAGreen, 30, SQ)],
-        [LS(Black,    3, TU), LS(ZAYellow, 4, TU), LS(ZAGreen,  7, TU), LS(White,   26, SQ)],
-        [LS(ZAYellow, 4, TU), LS(ZAGreen,  7, TU), LS(White,    4, TU), LS(ZABlue,  25, SQ)],
-        [LS(ZAYellow, 1, TU), LS(ZAGreen,  7, TU), LS(White,    4, TU), LS(ZABlue,  28, SQ)],
+        [LS(ZAYellow, 1, D3), LS(ZAGreen,  7, D3), LS(White,    4, D3), LS(ZARed,   28, SQ)],
+        [LS(ZAYellow, 4, D3), LS(ZAGreen,  7, D3), LS(White,    4, D3), LS(ZARed,   25, SQ)],
+        [LS(Black,    3, D3), LS(ZAYellow, 4, D3), LS(ZAGreen,  7, D3), LS(White,   26, SQ)],
+        [LS(Black,    3, SQ), LS(ZAYellow, 4, SQ), LS(ZAGreen, 33, SQ)],
+        #[LS(Black,    6, U3), LS(ZAYellow, 4, U3), LS(ZAGreen, 30, SQ)],
+        [LS(Black,    3, U3), LS(ZAYellow, 4, U3), LS(ZAGreen,  7, U3), LS(White,   26, SQ)],
+        [LS(ZAYellow, 4, U3), LS(ZAGreen,  7, U3), LS(White,    4, U3), LS(ZABlue,  25, SQ)],
+        [LS(ZAYellow, 1, U3), LS(ZAGreen,  7, U3), LS(White,    4, U3), LS(ZABlue,  28, SQ)],
     ],
     'swizerland': [
         [LS(CHRed, 20, SQ)],
@@ -147,12 +191,12 @@ FLAGS: dict[str, Flag] = {
         [LS(UAYellow, 30, SQ)],
     ],
     'palestine': [
-        [LS(PSRed, 3, TD), LS(Black,   27, SQ)],
-        [LS(PSRed, 6, TD), LS(Black,   24, SQ)],
-        [LS(PSRed, 9, TD), LS(White,   21, SQ)],
-        [LS(PSRed, 9, TU), LS(White,   21, SQ)],
-        [LS(PSRed, 6, TU), LS(PSGreen, 24, SQ)],
-        [LS(PSRed, 3, TU), LS(PSGreen, 27, SQ)],
+        [LS(PSRed,  6, D6), LS(Black,   32, SQ)],
+        [LS(PSRed, 12, D6), LS(Black,   26, SQ)],
+        [LS(PSRed, 18, D6), LS(White,   20, SQ)],
+        [LS(PSRed, 18, U6), LS(White,   20, SQ)],
+        [LS(PSRed, 12, U6), LS(PSGreen, 26, SQ)],
+        [LS(PSRed,  6, U6), LS(PSGreen, 32, SQ)],
     ]
 }
 
@@ -213,10 +257,17 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
 
                 if cap == LineCap.Square:
                     length_diff = 0
-                elif cap == LineCap.TriDown:
+                elif cap == LineCap.TriDown3:
                     length_diff = offset * 3
-                elif cap == LineCap.TriUp:
+                elif cap == LineCap.TriUp3:
                     length_diff = scale_index * 3
+                elif cap == LineCap.TriDown6:
+                    length_diff = offset * 6
+                elif cap == LineCap.TriUp6:
+                    length_diff = scale_index * 6
+                else:
+                    raise ValueError(f'unhandled LineCap value: {cap}')
+
                 length -= length_diff
 
                 if length < 0:
@@ -230,21 +281,6 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
     bg_col: Optional[Color] = None
     fg_col: Optional[Color] = None
 
-    def set_cols(new_bg: Optional[Color], new_fg: Optional[Color]) -> None:
-        nonlocal buf, bg_col, fg_col
-        if bg_col != new_bg:
-            if new_bg is None:
-                buf.append(f'\x1B[49m')
-            else:
-                buf.append(f'\x1B[48;2;{new_bg[0]};{new_bg[1]};{new_bg[2]}m')
-            bg_col = new_bg
-
-        if fg_col != new_fg:
-            if new_fg is None:
-                buf.append(f'\x1B[38;2;0;0;0m')
-            else:
-                buf.append(f'\x1B[38;2;{new_fg[0]};{new_fg[1]};{new_fg[2]}m')
-            fg_col = new_fg
 
     def set_bg(new_bg: Optional[Color]) -> None:
         nonlocal bg_col, buf
@@ -254,6 +290,19 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
             else:
                 buf.append(f'\x1B[48;2;{new_bg[0]};{new_bg[1]};{new_bg[2]}m')
             bg_col = new_bg
+
+    def set_fg(new_fg: Optional[Color]) -> None:
+        nonlocal buf, fg_col
+        if fg_col != new_fg:
+            if new_fg is None:
+                buf.append(f'\x1B[38;2;0;0;0m')
+            else:
+                buf.append(f'\x1B[38;2;{new_fg[0]};{new_fg[1]};{new_fg[2]}m')
+            fg_col = new_fg
+
+    def set_cols(new_bg: Optional[Color], new_fg: Optional[Color]) -> None:
+        set_bg(new_bg)
+        set_fg(new_fg)
 
     x = 0
     max_x = 0
@@ -297,15 +346,15 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
                 next_col = None
 
             if cap != LineCap.Square:
-                block_length = max(length - 3, 0)
+                block_length = max(length - cap.length, 0)
 
                 if block_length > 0:
-                    set_bg(col)
-                    buf.append(' ' * (block_length >> 1))
+                    set_fg(col)
+                    buf.append('█' * (block_length >> 1))
 
                 cap_length = length - block_length
                 if cap_length > 0:
-                    if cap == LineCap.TriDown:
+                    if cap == LineCap.TriDown3:
                         if carry_x:
                             set_cols(next_col, col)
                             if cap_length > 1:
@@ -317,7 +366,7 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
                                 buf.append('🭢')
                             buf.append('🭕')
 
-                    elif cap == LineCap.TriUp:
+                    elif cap == LineCap.TriUp3:
                         if carry_x:
                             set_cols(next_col, col)
                             if cap_length > 1:
@@ -329,10 +378,40 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
                                 buf.append('🭇')
                             buf.append('🭄')
 
+                    elif cap == LineCap.TriDown6:
+                        if carry_x or cap_length & 1:
+                            raise ValueError("LineCap.TriDown6 doesn't support sub-character precision")
+
+                        if cap_length > 4:
+                            set_cols(next_col, col)
+                            buf.append('🭍')
+
+                        if cap_length > 2:
+                            set_cols(col, next_col)
+                            buf.append('🭧')
+
+                        set_cols(next_col, col)
+                        buf.append('🬽')
+
+                    elif cap == LineCap.TriUp6:
+                        if carry_x or cap_length & 1:
+                            raise ValueError("LineCap.TriUp6 doesn't support sub-character precision")
+
+                        if cap_length > 4:
+                            set_cols(next_col, col)
+                            buf.append('🭞')
+
+                        if cap_length > 2:
+                            set_cols(col, next_col)
+                            buf.append('🭆')
+
+                        set_cols(next_col, col)
+                        buf.append('🭘')
+
             else:
                 if length > 0:
-                    set_bg(col)
-                    buf.append(' ' * (length >> 1))
+                    set_fg(col)
+                    buf.append('█' * (length >> 1))
 
                     if carry_x:
                         set_cols(next_col, col)
@@ -387,7 +466,7 @@ def draw_wrapped_flag_list(buf: list[str], flags: list[Flag], scale: int = 1) ->
     try:
         term_width = get_terminal_size().columns
     except:
-        draw_flag_list(buf, flags)
+        return draw_flag_list(buf, flags)
 
     if scale != 1:
         flags = [scale_flag(flag, scale) for flag in flags]
