@@ -778,8 +778,17 @@ def parse_scale(value: str) -> int:
 def main() -> None:
     ap = ArgumentParser()
     ap.add_argument('-s', '--scale', type=parse_scale, default=1)
-    ap.add_argument('flags', nargs='+')
+    ap.add_argument('-l', '--list', action='store_true', default=False, help="List built-in flags.")
+    ap.add_argument('flags', nargs='*')
+
     args = ap.parse_args()
+
+    if args.list:
+        print('all')
+        for flag_name in sorted(FLAGS):
+            print(flag_name)
+        return
+
     scale: int = args.scale
     flag_names: list[str] = args.flags
 
