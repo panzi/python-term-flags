@@ -315,6 +315,9 @@ FLAGS: dict[str, Flag] = {
         [LS(White,         16, D1), LS(AntArcticBlue, 1, U1), LS(White,         15, SQ)],
         [LS(White,         32, SQ)],
     ],
+    'monaco': [
+        [LS(White, 4, HS), LS((207,   8,  33), 0, HS)],
+    ]
 }
 
 FLAG_ALIASES = {
@@ -325,6 +328,7 @@ FLAG_ALIASES = {
     'ua': FLAGS['ukraine'],
     'ps': FLAGS['palestine'],
     'bh': FLAGS['bahrain'],
+    'mc': FLAGS['monaco'],
 
     'scot':  FLAGS['scotland'],
 
@@ -365,6 +369,13 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
     if scale < 1:
         raise ValueError(f'illegal scale: {scale}')
 
+    mid_index: Optional[int]
+    half_point = scale // 2
+    if scale & 1:
+        mid_index = half_point
+    else:
+        mid_index = None
+
     new_flag: Flag = []
     for flag_line in flag:
 
@@ -396,13 +407,14 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
                     length_diff = scale_index
                 elif cap == LineCap.HalfSquare:
                     length_diff = 0
-                    if scale_index < (scale // 2):
-                        next_index = segment_index + 1
-                        if next_index < len(flag_line):
-                            col = flag_line[next_index].color
-                        else:
-                            col = None
-                    cap = LineCap.Square
+                    if scale_index != mid_index:
+                        if scale_index < half_point:
+                            next_index = segment_index + 1
+                            if next_index < len(flag_line):
+                                col = flag_line[next_index].color
+                            else:
+                                col = None
+                        cap = LineCap.Square
                 else:
                     raise ValueError(f'unhandled LineCap value: {cap}')
 
