@@ -30,6 +30,16 @@
 # 🭝🭚
 # 🭗
 
+#  🭇🬼
+# 🭊🭁🭌🬿
+# 🭥🭒🭝🭚
+#  🭢🭗
+
+#   🭇🬼   
+#  🭊🭁🭌🬿 
+# █🭏🬼🭇🭄█
+# ██🭌🭁██
+
 # 🭀
 # 🭐
 # █🭀
@@ -50,12 +60,14 @@ from argparse import ArgumentParser, ArgumentTypeError
 import json
 
 class LineCap(Enum):
-    Square     = 1
-    TriDown3   = 2 # sub-character length: 3
-    TriUp3     = 3 # sub-character length: 3
-    TriDown6   = 4 # sub-character length: 6
-    TriUp6     = 5 # sub-character length: 6
-    HalfSquare = 6 # not about the line cap, but the line thickness, but also requires square line cap
+    Square      = 1
+    TriDown3    = 2 # sub-character length: 3
+    TriUp3      = 3 # sub-character length: 3
+    TriDown6    = 4 # sub-character length: 6
+    TriUp6      = 5 # sub-character length: 6
+    HalfSquare  = 6 # not about the line cap, but the line thickness, but also requires square line cap
+    TriDown1    = 7
+    TriUp1      = 8
 
     @property
     def length(self) -> int:
@@ -65,6 +77,8 @@ class LineCap(Enum):
             return 6
         elif self == LineCap.Square or self == LineCap.HalfSquare:
             return 0
+        elif self == LineCap.TriDown1 or self == LineCap.TriUp1:
+            return 1
         else:
             raise ValueError(f'unhandled LineCap value: {self}')
 
@@ -95,6 +109,8 @@ D3 = LineCap.TriDown3
 U3 = LineCap.TriUp3
 D6 = LineCap.TriDown6
 U6 = LineCap.TriUp6
+D1 = LineCap.TriDown1
+U1 = LineCap.TriUp1
 
 LineCapMap = {
     'sq': SQ, 'square':     SQ,
@@ -103,6 +119,8 @@ LineCapMap = {
     'u3': U3, 'triup3':     U3,
     'd6': D6, 'tridown6':   D6,
     'u6': U6, 'triup6':     U6,
+    'd1': D1, 'tridown1':   D1,
+    'u1': U1, 'triup1':     U1,
 }
 
 LS = LineSegment
@@ -129,6 +147,8 @@ PSRed   = (237,  46,  56)
 PSGreen = (  0, 150,  57)
 
 ScotBlue = (  0,   94, 184)
+
+AntArcticBlue = ( 27,  47,  76)
 
 FLAGS: dict[str, Flag] = {
     'progress-pride': [
@@ -215,14 +235,14 @@ FLAGS: dict[str, Flag] = {
         [LS(ATRed, 30, SQ)],
     ],
     'south-africa': [
-        [LS(ZAYellow, 1, D3), LS(ZAGreen,  7, D3), LS(White,    4, D3), LS(ZARed,   28, SQ)],
-        [LS(ZAYellow, 4, D3), LS(ZAGreen,  7, D3), LS(White,    4, D3), LS(ZARed,   25, SQ)],
-        [LS(Black,    3, D3), LS(ZAYellow, 4, D3), LS(ZAGreen,  7, D3), LS(White,   26, SQ)],
-        [LS(Black,    6, D3), LS(ZAYellow, 4, D3), LS(ZAGreen, 30, SQ)],
-        [LS(Black,    6, U3), LS(ZAYellow, 4, U3), LS(ZAGreen, 30, SQ)],
-        [LS(Black,    3, U3), LS(ZAYellow, 4, U3), LS(ZAGreen,  7, U3), LS(White,   26, SQ)],
-        [LS(ZAYellow, 4, U3), LS(ZAGreen,  7, U3), LS(White,    4, U3), LS(ZABlue,  25, SQ)],
-        [LS(ZAYellow, 1, U3), LS(ZAGreen,  7, U3), LS(White,    4, U3), LS(ZABlue,  28, SQ)],
+        [LS(ZAYellow, 2, D6), LS(ZAGreen,  8, D6), LS(White,    6, D6), LS(ZARed,   30, SQ)],
+        [LS(Black,    2, D6), LS(ZAYellow, 6, D6), LS(ZAGreen,  8, D6), LS(White,    6, D6), LS(ZARed,   24, SQ)],
+        [LS(Black,    8, D6), LS(ZAYellow, 6, D6), LS(ZAGreen,  8, D6), LS(White,   24, SQ)],
+        [LS(Black,   14, D6), LS(ZAYellow, 6, D6), LS(ZAGreen, 26, SQ)],
+        [LS(Black,   14, U6), LS(ZAYellow, 6, U6), LS(ZAGreen, 26, SQ)],
+        [LS(Black,    8, U6), LS(ZAYellow, 6, U6), LS(ZAGreen,  8, U6), LS(White,   24, SQ)],
+        [LS(Black,    2, U6), LS(ZAYellow, 6, U6), LS(ZAGreen,  8, U6), LS(White,    6, U6), LS(ZABlue,  24, SQ)],
+        [LS(ZAYellow, 2, U6), LS(ZAGreen,  8, U6), LS(White,    6, U6), LS(ZABlue,  30, SQ)],
     ],
     'swizerland': [
         [LS(CHRed, 20, SQ)],
@@ -280,6 +300,20 @@ FLAGS: dict[str, Flag] = {
         [LS(White, 18, U6), LS(BHRed, 36, SQ)],
         [LS(White, 18, D6), LS(BHRed, 36, SQ)],
         [LS(White, 18, U6), LS(BHRed, 36, SQ)],
+    ],
+    'antarctic': [
+        [LS(AntArcticBlue, 20, SQ)],
+        [LS(AntArcticBlue, 10, U3), LS(White,         3, D3), LS(AntArcticBlue, 7, SQ)],
+        [LS(White,         10, D3), LS(AntArcticBlue, 3, U3), LS(White,         7, SQ)],
+        [LS(White,         20, SQ)],
+    ],
+    'antarctic-alt': [
+        [LS(AntArcticBlue, 32, SQ)],
+        [LS(AntArcticBlue, 16, U1), LS(White,         1, D1), LS(AntArcticBlue, 15, SQ)],
+        [LS(AntArcticBlue, 15, U1), LS(White,         3, D1), LS(AntArcticBlue, 14, SQ)],
+        [LS(White,         15, D1), LS(AntArcticBlue, 3, U1), LS(White,         14, SQ)],
+        [LS(White,         16, D1), LS(AntArcticBlue, 1, U1), LS(White,         15, SQ)],
+        [LS(White,         32, SQ)],
     ],
 }
 
@@ -356,6 +390,10 @@ def scale_flag(flag: Flag, scale: int) -> Flag:
                     length_diff = offset * 6
                 elif cap == LineCap.TriUp6:
                     length_diff = scale_index * 6
+                elif cap == LineCap.TriDown1:
+                    length_diff = offset
+                elif cap == LineCap.TriUp1:
+                    length_diff = scale_index
                 elif cap == LineCap.HalfSquare:
                     length_diff = 0
                     if scale_index < (scale // 2):
@@ -543,6 +581,23 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
 
                         set_cols(next_col, col)
                         buf.append('🭘')
+
+                    elif cap == LineCap.TriDown1:
+                        set_cols(next_col, col)
+                        if carry_x:
+                            buf.append('🭀')
+                        else:
+                            buf.append('🭐')
+
+                    elif cap == LineCap.TriUp1:
+                        set_cols(next_col, col)
+                        if carry_x:
+                            buf.append('🭛')
+                        else:
+                            buf.append('🭡')
+
+                    else:
+                        raise ValueError(f'unhadled LineCap value: {cap}')
 
             prev_carry_x = carry_x
 
