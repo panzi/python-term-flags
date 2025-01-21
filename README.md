@@ -1,8 +1,8 @@
 Term Flags
 ==========
 
-A kinda primitive way to render scalable flags on the terminal. A better system
-could enable drawing of more details.
+A primitive sytem to render simple scalable flags on the terminal. A better
+system could enable drawing of more details.
 
 Not all terminals or fonts used in terminals work well with this. In my tests
 konsole with it's default font 'Hack' worked well. gnome-terminal was ok, but
