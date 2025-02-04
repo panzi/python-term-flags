@@ -31,7 +31,7 @@ In case you're interested, here is a list of those things:
 - [Color Cycling](https://github.com/panzi/rust-color-cycle) (Rust): This is a
   method to give otherwise static pixel art images some kind of animation using
   its color palette.
-- [Bad Apple!! but its the Unix Terminal](https://github.com/panzi/rust-color-cycle)
+- [Bad Apple!! but its the Unix Terminal](https://github.com/panzi/bad-apple-terminal)
   (C): A program that displays the Bad Apple!! animation on the terminal.
 - [ANSI IMG](https://github.com/panzi/ansi-img) (Rust): Display images (including
   animated GIFs) on the terminal.

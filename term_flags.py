@@ -433,7 +433,6 @@ def draw_flag(buf: list[str], flag: Flag) -> None:
     bg_col: Optional[Color] = None
     fg_col: Optional[Color] = None
 
-
     def set_bg(new_bg: Optional[Color]) -> None:
         nonlocal bg_col, buf
         if bg_col != new_bg:
